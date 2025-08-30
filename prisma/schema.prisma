@@ -7,3 +7,105 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// Enum cho vai trò người dùng
+enum Role {
+  DOCTOR
+  PATIENT
+  MANAGER
+}
+
+// Bảng User (người dùng chung)
+model User {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  password   String
+  role       Role
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  Doctor  Doctor?
+  Patient Patient?
+  Manager Manager?
+}
+
+// Bảng Doctor (bác sĩ)
+model Doctor {
+  id            String           @id @default(uuid())
+  userId        String           @unique
+  specialty     String
+  image_url     String?
+  schedules     DoctorSchedule[]
+  prescriptions Prescription[]
+  managedBy     Manager?         @relation(fields: [managerId], references: [id], name: "DoctorManagedBy")
+  managerId     String?
+  created_at    DateTime         @default(now())
+  updated_at    DateTime         @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+// Bảng Patient (bệnh nhân)
+model Patient {
+  id              String         @id @default(uuid())
+  userId          String         @unique
+  date_of_birth   DateTime?
+  medical_history String?
+  prescriptions   Prescription[]
+  managedBy       Manager?       @relation(fields: [managerId], references: [id], name: "PatientManagedBy")
+  managerId       String?
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+// Bảng Manager (quản lý)
+model Manager {
+  id         String    @id @default(uuid())
+  userId     String    @unique
+  department String?
+  doctors    Doctor[]  @relation(name: "DoctorManagedBy")
+  patients   Patient[] @relation(name: "PatientManagedBy")
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+// Bảng Medication (từ yêu cầu trước)
+model Medication {
+  id            Int            @id @default(autoincrement())
+  name          String
+  code          String         @unique
+  price         Float
+  quantity      Int
+  prescriptions Prescription[]
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt
+}
+
+// Bảng DoctorSchedule (từ yêu cầu trước)
+model DoctorSchedule {
+  id         String   @id @default(uuid())
+  doctor     Doctor   @relation(fields: [doctorId], references: [id])
+  doctorId   String
+  start_time DateTime
+  end_time   DateTime
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+// Bảng Prescription (liên kết bác sĩ, bệnh nhân, thuốc)
+model Prescription {
+  id           String     @id @default(uuid())
+  doctor       Doctor     @relation(fields: [doctorId], references: [id])
+  doctorId     String
+  patient      Patient    @relation(fields: [patientId], references: [id])
+  patientId    String
+  medication   Medication @relation(fields: [medicationId], references: [id])
+  medicationId Int
+  dosage       String?
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @updatedAt
+}
