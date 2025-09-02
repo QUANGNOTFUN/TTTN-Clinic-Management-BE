@@ -29,11 +29,28 @@ CREATE TABLE "public"."Patient" (
     "updated_at" TIMESTAMP(3) NOT NULL
 );
 
+-- CreateTable
+CREATE TABLE "public"."Doctor" (
+    "user_id" TEXT NOT NULL,
+    "full_name" TEXT NOT NULL,
+    "gender" TEXT,
+    "phone_number" TEXT,
+    "specialty" TEXT,
+    "rating" INTEGER,
+    "bio" TEXT,
+    "avatar_url" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Account_email_key" ON "public"."Account"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Patient_user_id_key" ON "public"."Patient"("user_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Doctor_user_id_key" ON "public"."Doctor"("user_id");
 
 -- AddForeignKey
 ALTER TABLE "public"."Patient" ADD CONSTRAINT "Patient_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."Account"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

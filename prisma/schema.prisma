@@ -15,7 +15,6 @@ enum Role {
   MANAGER
 }
 
-// Bảng User (người dùng chung)
 model Account {
   id         String   @id @default(uuid())
   email      String   @unique
@@ -27,20 +26,32 @@ model Account {
   Patient Patient?
 }
 
-// Bảng Patient (bệnh nhân)
 model Patient {
   user_id           String    @unique @default(uuid())
   full_name         String?
-  gender            String? // Giới tính (ví dụ: "male", "female", "other")
-  date_of_birth     DateTime? // Ngày sinh
-  medical_history   String? // Lịch sử y tế
-  address           String? // Địa chỉ
-  phone_number      String? // Số điện thoại
-  blood_type        String? // Nhóm máu (ví dụ: "A+", "B-", "O+")
-  emergency_contact String? // Liên hệ khẩn cấp
-  insurance_number  String? // Số bảo hiểm y tế
+  gender            String?
+  date_of_birth     DateTime?
+  medical_history   String?
+  address           String?
+  phone_number      String?
+  blood_type        String?
+  emergency_contact String?
+  insurance_number  String?
   created_at        DateTime  @default(now())
   updated_at        DateTime  @updatedAt
 
   user Account @relation(fields: [user_id], references: [id])
+}
+
+model Doctor {
+  user_id      String   @unique @default(uuid())
+  full_name    String?
+  gender       String?
+  phone_number String?
+  specialty    String?
+  rating       Int?
+  bio          String?
+  avatar_url   String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 }
