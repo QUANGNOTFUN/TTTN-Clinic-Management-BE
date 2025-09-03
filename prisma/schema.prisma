@@ -55,3 +55,14 @@ model Doctor {
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
 }
+
+model ClinicService {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  duration    Int?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
