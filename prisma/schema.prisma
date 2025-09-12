@@ -40,7 +40,8 @@ model Patient {
   created_at        DateTime  @default(now())
   updated_at        DateTime  @updatedAt
 
-  user Account @relation(fields: [user_id], references: [id])
+  user               Account              @relation(fields: [user_id], references: [id])
+  AppointmentRequest AppointmentRequest[]
 }
 
 model Doctor {
@@ -57,12 +58,37 @@ model Doctor {
 }
 
 model ClinicService {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  description String?
-  price       Decimal  @db.Decimal(10, 2)
-  duration    Int?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                 String               @id @default(uuid())
+  name               String               @unique
+  description        String?
+  price              Decimal              @db.Decimal(10, 2)
+  duration_minutes   Int?
+  image_url          String?
+  requires_doctor    Boolean?
+  is_active          Boolean              @default(true)
+  created_at         DateTime             @default(now())
+  updated_at         DateTime             @updatedAt
+  AppointmentRequest AppointmentRequest[]
+}
+
+enum StatusRequest {
+  PENDING
+  CONFIRMED
+  REJECTED
+  CANCELLED
+}
+
+model AppointmentRequest {
+  id               String        @id @default(uuid())
+  full_name        String
+  phone_number     String
+  patient_id       String
+  service_id       String
+  appointment_time DateTime
+  status           StatusRequest @default(PENDING)
+  created_at       DateTime      @default(now())
+  updated_at       DateTime      @updatedAt
+
+  patient Patient       @relation(fields: [patient_id], references: [user_id])
+  service ClinicService @relation(fields: [service_id], references: [id])
 }
