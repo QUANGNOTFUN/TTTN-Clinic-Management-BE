@@ -1,0 +1,1 @@
+import { Role } from '../entities/account.dto';export interface RequestSessionDto extends Request {  user: {    id: string;    email: string;    role: Role;  };}
