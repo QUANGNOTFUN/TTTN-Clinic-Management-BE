@@ -2,6 +2,12 @@
 CREATE TYPE "public"."Role" AS ENUM ('DOCTOR', 'PATIENT', 'MANAGER');
 
 -- CreateEnum
+CREATE TYPE "public"."Shift" AS ENUM ('MORNING', 'AFTERNOON', 'OVERTIME');
+
+-- CreateEnum
+CREATE TYPE "public"."QueueStatus" AS ENUM ('WAITING', 'CALLED', 'IN_PROGRESS', 'DONE', 'CANCELLED');
+
+-- CreateEnum
 CREATE TYPE "public"."StatusRequest" AS ENUM ('PENDING', 'CONFIRMED', 'REJECTED', 'CANCELLED');
 
 -- CreateTable
@@ -47,6 +53,21 @@ CREATE TABLE "public"."Doctor" (
 );
 
 -- CreateTable
+CREATE TABLE "public"."DoctorSchedule" (
+    "id" TEXT NOT NULL,
+    "doctor_id" TEXT NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL,
+    "shift" "public"."Shift" NOT NULL,
+    "start_time" TIMESTAMP(3) NOT NULL,
+    "end_time" TIMESTAMP(3) NOT NULL,
+    "is_available" BOOLEAN NOT NULL DEFAULT true,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "DoctorSchedule_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "public"."ClinicService" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -77,6 +98,23 @@ CREATE TABLE "public"."AppointmentRequest" (
     CONSTRAINT "AppointmentRequest_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "public"."AppointmentQueue" (
+    "id" TEXT NOT NULL,
+    "patient_id" TEXT NOT NULL,
+    "doctor_id" TEXT NOT NULL,
+    "appointment_request_id" TEXT NOT NULL,
+    "queue_number" INTEGER NOT NULL,
+    "status" "public"."QueueStatus" NOT NULL DEFAULT 'WAITING',
+    "scheduled_at" TIMESTAMP(3) NOT NULL,
+    "checked_in_at" TIMESTAMP(3),
+    "finished_at" TIMESTAMP(3),
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "AppointmentQueue_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Account_email_key" ON "public"."Account"("email");
 
@@ -93,7 +131,19 @@ CREATE UNIQUE INDEX "ClinicService_name_key" ON "public"."ClinicService"("name")
 ALTER TABLE "public"."Patient" ADD CONSTRAINT "Patient_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."Account"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "public"."DoctorSchedule" ADD CONSTRAINT "DoctorSchedule_doctor_id_fkey" FOREIGN KEY ("doctor_id") REFERENCES "public"."Doctor"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "public"."AppointmentRequest" ADD CONSTRAINT "AppointmentRequest_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."Patient"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."AppointmentRequest" ADD CONSTRAINT "AppointmentRequest_service_id_fkey" FOREIGN KEY ("service_id") REFERENCES "public"."ClinicService"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."AppointmentQueue" ADD CONSTRAINT "AppointmentQueue_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."Patient"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."AppointmentQueue" ADD CONSTRAINT "AppointmentQueue_doctor_id_fkey" FOREIGN KEY ("doctor_id") REFERENCES "public"."Doctor"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."AppointmentQueue" ADD CONSTRAINT "AppointmentQueue_appointment_request_id_fkey" FOREIGN KEY ("appointment_request_id") REFERENCES "public"."AppointmentRequest"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

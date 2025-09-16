@@ -15,6 +15,27 @@ enum Role {
   MANAGER
 }
 
+enum Shift {
+  MORNING
+  AFTERNOON
+  OVERTIME
+}
+
+enum QueueStatus {
+  WAITING
+  CALLED
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+enum StatusRequest {
+  PENDING
+  CONFIRMED
+  REJECTED
+  CANCELLED
+}
+
 model Account {
   id         String   @id @default(uuid())
   email      String   @unique
@@ -42,40 +63,55 @@ model Patient {
 
   user               Account              @relation(fields: [user_id], references: [id])
   AppointmentRequest AppointmentRequest[]
+  AppointmentQueue   AppointmentQueue[]
 }
 
 model Doctor {
-  user_id      String   @unique @default(uuid())
+  id           String           @id @default(uuid())
+  user_id      String           @unique @default(uuid())
   full_name    String?
   gender       String?
   phone_number String?
   specialty    String?
+  services     ClinicService[]  @relation("DoctorToService")
+  schedules    DoctorSchedule[]
   rating       Int?
   bio          String?
   avatar_url   String?
+  created_at   DateTime         @default(now())
+  updated_at   DateTime         @updatedAt
+
+  AppointmentQueue AppointmentQueue[]
+}
+
+model DoctorSchedule {
+  id           String   @id @default(uuid())
+  doctor_id    String
+  date         DateTime
+  shift        Shift
+  start_time   DateTime
+  end_time     DateTime
+  is_available Boolean  @default(true)
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
+
+  doctor Doctor @relation(fields: [doctor_id], references: [user_id])
 }
 
 model ClinicService {
-  id                 String               @id @default(uuid())
-  name               String               @unique
-  description        String?
-  price              Decimal              @db.Decimal(10, 2)
-  duration_minutes   Int?
-  image_url          String?
-  requires_doctor    Boolean?
-  is_active          Boolean              @default(true)
-  created_at         DateTime             @default(now())
-  updated_at         DateTime             @updatedAt
-  AppointmentRequest AppointmentRequest[]
-}
+  id               String   @id @default(uuid())
+  name             String   @unique
+  description      String?
+  price            Decimal  @db.Decimal(10, 2)
+  duration_minutes Int?
+  image_url        String?
+  requires_doctor  Boolean?
+  is_active        Boolean  @default(true)
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
 
-enum StatusRequest {
-  PENDING
-  CONFIRMED
-  REJECTED
-  CANCELLED
+  AppointmentRequest AppointmentRequest[]
+  doctors            Doctor[]             @relation("DoctorToService")
 }
 
 model AppointmentRequest {
@@ -89,6 +125,25 @@ model AppointmentRequest {
   created_at       DateTime      @default(now())
   updated_at       DateTime      @updatedAt
 
-  patient Patient       @relation(fields: [patient_id], references: [user_id])
-  service ClinicService @relation(fields: [service_id], references: [id])
+  patient          Patient            @relation(fields: [patient_id], references: [user_id])
+  service          ClinicService      @relation(fields: [service_id], references: [id])
+  AppointmentQueue AppointmentQueue[]
+}
+
+model AppointmentQueue {
+  id                     String      @id @default(uuid()) // ID của queue item
+  patient_id             String // Liên kết bệnh nhân
+  doctor_id              String // Liên kết bác sĩ
+  appointment_request_id String // Liên kết từ request gốc
+  queue_number           Int // Số thứ tự trong hàng chờ
+  status                 QueueStatus @default(WAITING) // Trạng thái trong queue
+  scheduled_at           DateTime // Thời gian hẹn khám chính thức
+  checked_in_at          DateTime? // Thời gian bệnh nhân check-in
+  finished_at            DateTime? // Thời gian kết thúc khám
+  created_at             DateTime    @default(now())
+  updated_at             DateTime    @updatedAt
+
+  patient Patient            @relation(fields: [patient_id], references: [user_id])
+  doctor  Doctor             @relation(fields: [doctor_id], references: [user_id])
+  request AppointmentRequest @relation(fields: [appointment_request_id], references: [id])
 }
