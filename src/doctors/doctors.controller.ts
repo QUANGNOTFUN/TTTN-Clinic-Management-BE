@@ -1,1 +1,28 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';import { DoctorsService } from './doctors.service';import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';import { RolesGuard } from '../auth/jwt/roles.guard';import { Roles } from '../auth/jwt/roles.decorate';import { Role } from '../auth/entities/account.dto';@Controller('doctors')export class DoctorsController {  constructor(private readonly doctorsService: DoctorsService) {}  @Get('findAll')  findAll() {    return this.doctorsService.findAll();  }  @UseGuards(JwtAuthGuard, RolesGuard)  @Roles(Role.DOCTOR)  @Get('findOne')  async findOne(@Req() req: any) {    return this.doctorsService.findOne(req.user.id);  }}
+import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { DoctorsService } from './doctors.service';
+import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
+import { RolesGuard } from '../auth/jwt/roles.guard';
+import { Roles } from '../auth/jwt/roles.decorate';
+import { Role } from '../auth/entities/account.dto';
+
+@Controller('doctors')
+export class DoctorsController {
+  constructor(private readonly doctorsService: DoctorsService) {}
+
+  @Get('findAll')
+  findAll() {
+    return this.doctorsService.findAll();
+  }
+
+  @Get()
+  findAllPublic() {
+    return this.doctorsService.findAllWithServices();
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.DOCTOR)
+  @Get('findOne')
+  async findOne(@Req() req: any) {
+    return this.doctorsService.findOne(req.user.id);
+  }
+}
