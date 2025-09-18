@@ -1,0 +1,1 @@
+export enum Shift {  MORNING = 'MORNING',  AFTERNOON = 'AFTERNOON',  OVERTIME = 'OVERTIME',}export class DoctorSchedule {}
