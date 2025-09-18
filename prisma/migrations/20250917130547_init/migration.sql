@@ -35,7 +35,9 @@ CREATE TABLE "public"."Patient" (
     "emergency_contact" TEXT,
     "insurance_number" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Patient_pkey" PRIMARY KEY ("user_id")
 );
 
 -- CreateTable
@@ -49,7 +51,9 @@ CREATE TABLE "public"."Doctor" (
     "bio" TEXT,
     "avatar_url" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Doctor_pkey" PRIMARY KEY ("user_id")
 );
 
 -- CreateTable
@@ -58,8 +62,6 @@ CREATE TABLE "public"."DoctorSchedule" (
     "doctor_id" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
     "shift" "public"."Shift" NOT NULL,
-    "start_time" TIMESTAMP(3) NOT NULL,
-    "end_time" TIMESTAMP(3) NOT NULL,
     "is_available" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -115,20 +117,28 @@ CREATE TABLE "public"."AppointmentQueue" (
     CONSTRAINT "AppointmentQueue_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "public"."_DoctorToService" (
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL,
+
+    CONSTRAINT "_DoctorToService_AB_pkey" PRIMARY KEY ("A","B")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Account_email_key" ON "public"."Account"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Patient_user_id_key" ON "public"."Patient"("user_id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Doctor_user_id_key" ON "public"."Doctor"("user_id");
-
--- CreateIndex
 CREATE UNIQUE INDEX "ClinicService_name_key" ON "public"."ClinicService"("name");
+
+-- CreateIndex
+CREATE INDEX "_DoctorToService_B_index" ON "public"."_DoctorToService"("B");
 
 -- AddForeignKey
 ALTER TABLE "public"."Patient" ADD CONSTRAINT "Patient_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."Account"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."Doctor" ADD CONSTRAINT "Doctor_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."Account"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."DoctorSchedule" ADD CONSTRAINT "DoctorSchedule_doctor_id_fkey" FOREIGN KEY ("doctor_id") REFERENCES "public"."Doctor"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -147,3 +157,9 @@ ALTER TABLE "public"."AppointmentQueue" ADD CONSTRAINT "AppointmentQueue_doctor_
 
 -- AddForeignKey
 ALTER TABLE "public"."AppointmentQueue" ADD CONSTRAINT "AppointmentQueue_appointment_request_id_fkey" FOREIGN KEY ("appointment_request_id") REFERENCES "public"."AppointmentRequest"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."_DoctorToService" ADD CONSTRAINT "_DoctorToService_A_fkey" FOREIGN KEY ("A") REFERENCES "public"."ClinicService"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."_DoctorToService" ADD CONSTRAINT "_DoctorToService_B_fkey" FOREIGN KEY ("B") REFERENCES "public"."Doctor"("user_id") ON DELETE CASCADE ON UPDATE CASCADE;

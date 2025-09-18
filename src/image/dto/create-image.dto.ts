@@ -1,0 +1,1 @@
+import { IsOptional, IsString, MaxLength } from 'class-validator';export class CreateImageDto {  @IsString({ message: 'Tên ảnh phải là chuỗi ký tự.' })  @IsOptional()  @MaxLength(100, { message: 'Tên ảnh không được vượt quá 100 ký tự.' })  name?: string;}
