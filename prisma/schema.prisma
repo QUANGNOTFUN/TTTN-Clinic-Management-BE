@@ -15,6 +15,12 @@ enum Role {
   MANAGER
 }
 
+enum Gender {
+  MALE
+  FEMALE
+  UNKNOWN
+}
+
 enum Shift {
   MORNING
   AFTERNOON
@@ -41,6 +47,7 @@ model Account {
   email      String   @unique
   password   String
   role       Role
+  is_active  Boolean
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
@@ -51,7 +58,7 @@ model Account {
 model Patient {
   user_id           String    @id @default(uuid())
   full_name         String?
-  gender            String?
+  gender            Gender
   date_of_birth     DateTime?
   medical_history   String?
   address           String?
@@ -68,20 +75,20 @@ model Patient {
 }
 
 model Doctor {
-  user_id      String           @id @default(uuid())
+  user_id      String   @id @default(uuid())
   full_name    String?
   gender       String?
   phone_number String?
   specialty    String?
-  services     ClinicService[]  @relation("DoctorToService")
-  schedules    DoctorSchedule[]
   rating       Int?
   bio          String?
   avatar_url   String?
-  created_at   DateTime         @default(now())
-  updated_at   DateTime         @updatedAt
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 
   user             Account            @relation(fields: [user_id], references: [id])
+  services         ClinicService[]    @relation("DoctorToService")
+  schedules        DoctorSchedule[]
   AppointmentQueue AppointmentQueue[]
 }
 

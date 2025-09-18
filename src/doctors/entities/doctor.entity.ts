@@ -1,1 +1,1 @@
-export class Doctor {}
+export class Doctor {}export enum Gender {  MALE = 'MALE',  FEMALE = 'FEMALE',  UNKNOWN = 'UNKNOWN',}

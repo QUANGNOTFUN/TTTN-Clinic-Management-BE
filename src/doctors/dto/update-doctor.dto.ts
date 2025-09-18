@@ -1,4 +1,1 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateDoctorDto } from './create-doctor.dto';
-
-export class UpdateDoctorDto extends PartialType(CreateDoctorDto) {}
+import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';export class UpdateDoctorDto {  @IsString({ message: 'Họ và tên phải là chuỗi ký tự.' })  @MinLength(2, { message: 'Họ và tên phải có ít nhất 2 ký tự.' })  @MaxLength(100, { message: 'Họ và tên không được vượt quá 100 ký tự.' })  @IsOptional()  full_name?: string;  @IsString({ message: 'Giới tính phải là chuỗi ký tự.' })  @IsOptional()  gender?: string;  @IsString({ message: 'Số điện thoại phải là chuỗi ký tự.' })  @MaxLength(15, { message: 'Số điện thoại không được vượt quá 15 ký tự.' })  @IsOptional()  phone_number?: string;  @IsString({ message: 'Chuyên khoa phải là chuỗi ký tự.' })  @IsOptional()  specialty?: string;  @IsString({ message: 'Tiểu sử phải là chuỗi ký tự.' })  @MaxLength(500, { message: 'Tiểu sử không được vượt quá 500 ký tự.' })  @IsOptional()  bio?: string;}
