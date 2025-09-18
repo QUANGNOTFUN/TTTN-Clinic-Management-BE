@@ -1,1 +1,32 @@
-import { Injectable } from '@nestjs/common';import { PrismaService } from '../prisma/prisma.service';@Injectable()export class DoctorsService {  constructor(private readonly prisma: PrismaService) {}  findAll() {    return this.prisma.doctor.findMany();  }  async findOne(id: string) {    return this.prisma.doctor.findUnique({      where: { user_id: id },    });  }  remove(id: number) {    return `This action removes a #${id} doctor`;  }}
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+
+@Injectable()
+export class DoctorsService {
+  constructor(private readonly prisma: PrismaService) {}
+  findAll() {
+    return this.prisma.doctor.findMany();
+  }
+
+  async findAllWithServices() {
+    return this.prisma.doctor.findMany({
+      include: {
+        services: {
+          select: {
+            name: true
+          }
+        }
+      }
+    });
+  }
+
+  async findOne(id: string) {
+    return this.prisma.doctor.findUnique({
+      where: { user_id: id },
+    });
+  }
+
+  remove(id: number) {
+    return `This action removes a #${id} doctor`;
+  }
+}
