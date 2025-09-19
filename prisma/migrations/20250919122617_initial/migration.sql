@@ -2,6 +2,9 @@
 CREATE TYPE "public"."Role" AS ENUM ('DOCTOR', 'PATIENT', 'MANAGER');
 
 -- CreateEnum
+CREATE TYPE "public"."Gender" AS ENUM ('MALE', 'FEMALE', 'UNKNOWN');
+
+-- CreateEnum
 CREATE TYPE "public"."Shift" AS ENUM ('MORNING', 'AFTERNOON', 'OVERTIME');
 
 -- CreateEnum
@@ -16,6 +19,7 @@ CREATE TABLE "public"."Account" (
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "role" "public"."Role" NOT NULL,
+    "is_active" BOOLEAN NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -26,7 +30,7 @@ CREATE TABLE "public"."Account" (
 CREATE TABLE "public"."Patient" (
     "user_id" TEXT NOT NULL,
     "full_name" TEXT,
-    "gender" TEXT,
+    "gender" "public"."Gender" NOT NULL,
     "date_of_birth" TIMESTAMP(3),
     "medical_history" TEXT,
     "address" TEXT,
