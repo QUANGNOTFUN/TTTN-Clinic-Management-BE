@@ -60,6 +60,7 @@ model Patient {
   full_name         String?
   gender            Gender
   date_of_birth     DateTime?
+  avatar_url        String?
   medical_history   String?
   address           String?
   phone_number      String?
@@ -71,7 +72,7 @@ model Patient {
 
   user               Account              @relation(fields: [user_id], references: [id])
   AppointmentRequest AppointmentRequest[]
-  AppointmentQueue   AppointmentQueue[]
+  Appointment        Appointment[]
 }
 
 model Doctor {
@@ -86,10 +87,11 @@ model Doctor {
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
 
-  user             Account            @relation(fields: [user_id], references: [id])
-  services         ClinicService[]    @relation("DoctorToService")
-  schedules        DoctorSchedule[]
-  AppointmentQueue AppointmentQueue[]
+  user               Account              @relation(fields: [user_id], references: [id])
+  services           ClinicService[]      @relation("DoctorToService")
+  schedules          DoctorSchedule[]
+  Appointment        Appointment[]
+  AppointmentRequest AppointmentRequest[]
 }
 
 model DoctorSchedule {
@@ -126,17 +128,19 @@ model AppointmentRequest {
   phone_number     String
   patient_id       String
   service_id       String
+  doctor_id        String?
   appointment_time DateTime
   status           StatusRequest @default(PENDING)
   created_at       DateTime      @default(now())
   updated_at       DateTime      @updatedAt
 
-  patient          Patient            @relation(fields: [patient_id], references: [user_id])
-  service          ClinicService      @relation(fields: [service_id], references: [id])
-  AppointmentQueue AppointmentQueue[]
+  doctor      Doctor?       @relation(fields: [doctor_id], references: [user_id])
+  patient     Patient       @relation(fields: [patient_id], references: [user_id])
+  service     ClinicService @relation(fields: [service_id], references: [id])
+  Appointment Appointment[]
 }
 
-model AppointmentQueue {
+model Appointment {
   id                     String      @id @default(uuid()) // ID của queue item
   patient_id             String // Liên kết bệnh nhân
   doctor_id              String // Liên kết bác sĩ

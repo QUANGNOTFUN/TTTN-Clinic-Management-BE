@@ -32,6 +32,7 @@ CREATE TABLE "public"."Patient" (
     "full_name" TEXT,
     "gender" "public"."Gender" NOT NULL,
     "date_of_birth" TIMESTAMP(3),
+    "avatar_url" TEXT,
     "medical_history" TEXT,
     "address" TEXT,
     "phone_number" TEXT,
@@ -96,6 +97,7 @@ CREATE TABLE "public"."AppointmentRequest" (
     "phone_number" TEXT NOT NULL,
     "patient_id" TEXT NOT NULL,
     "service_id" TEXT NOT NULL,
+    "doctor_id" TEXT,
     "appointment_time" TIMESTAMP(3) NOT NULL,
     "status" "public"."StatusRequest" NOT NULL DEFAULT 'PENDING',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -105,7 +107,7 @@ CREATE TABLE "public"."AppointmentRequest" (
 );
 
 -- CreateTable
-CREATE TABLE "public"."AppointmentQueue" (
+CREATE TABLE "public"."Appointment" (
     "id" TEXT NOT NULL,
     "patient_id" TEXT NOT NULL,
     "doctor_id" TEXT NOT NULL,
@@ -118,7 +120,7 @@ CREATE TABLE "public"."AppointmentQueue" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "AppointmentQueue_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Appointment_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -148,19 +150,22 @@ ALTER TABLE "public"."Doctor" ADD CONSTRAINT "Doctor_user_id_fkey" FOREIGN KEY (
 ALTER TABLE "public"."DoctorSchedule" ADD CONSTRAINT "DoctorSchedule_doctor_id_fkey" FOREIGN KEY ("doctor_id") REFERENCES "public"."Doctor"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "public"."AppointmentRequest" ADD CONSTRAINT "AppointmentRequest_doctor_id_fkey" FOREIGN KEY ("doctor_id") REFERENCES "public"."Doctor"("user_id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "public"."AppointmentRequest" ADD CONSTRAINT "AppointmentRequest_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."Patient"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."AppointmentRequest" ADD CONSTRAINT "AppointmentRequest_service_id_fkey" FOREIGN KEY ("service_id") REFERENCES "public"."ClinicService"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."AppointmentQueue" ADD CONSTRAINT "AppointmentQueue_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."Patient"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."Appointment" ADD CONSTRAINT "Appointment_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."Patient"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."AppointmentQueue" ADD CONSTRAINT "AppointmentQueue_doctor_id_fkey" FOREIGN KEY ("doctor_id") REFERENCES "public"."Doctor"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."Appointment" ADD CONSTRAINT "Appointment_doctor_id_fkey" FOREIGN KEY ("doctor_id") REFERENCES "public"."Doctor"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."AppointmentQueue" ADD CONSTRAINT "AppointmentQueue_appointment_request_id_fkey" FOREIGN KEY ("appointment_request_id") REFERENCES "public"."AppointmentRequest"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."Appointment" ADD CONSTRAINT "Appointment_appointment_request_id_fkey" FOREIGN KEY ("appointment_request_id") REFERENCES "public"."AppointmentRequest"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."_DoctorToService" ADD CONSTRAINT "_DoctorToService_A_fkey" FOREIGN KEY ("A") REFERENCES "public"."ClinicService"("id") ON DELETE CASCADE ON UPDATE CASCADE;
